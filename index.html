@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlickFrenzy - Your Movie Companion</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background-color: #141414;
+            color: #ffffff;
+        }
+
+        .navbar {
+            background-color: #000000;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            color: #E50914;
+            font-size: 2rem;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .nav-links a {
+            color: #ffffff;
+            text-decoration: none;
+            margin-left: 2rem;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #E50914;
+        }
+
+        .hero {
+            height: 100vh;
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
+                        url('https://images.unsplash.com/photo-1536440136628-849c177e76a1?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 0 1rem;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            color: #ffffff;
+        }
+
+        .hero p {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            color: #ffffff;
+        }
+
+        .filters {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-select {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .search-container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: 4px;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            font-size: 1.1rem;
+        }
+
+        .search-box::placeholder {
+            color: #999;
+        }
+
+        .search-box:focus {
+            outline: none;
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .cta-button {
+            background-color: #E50914;
+            color: #ffffff;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 4px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 1rem;
+        }
+
+        .cta-button:hover {
+            background-color: #f40612;
+        }
+
+        .movie-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .movie-card {
+            position: relative;
+            background-color: #1f1f1f;
+            border-radius: 4px;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .movie-card:hover {
+            transform: scale(1.05);
+        }
+
+        .movie-card img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+        }
+
+        .movie-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 1.5rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            overflow-y: auto;
+        }
+
+        .movie-card:hover .movie-overlay {
+            opacity: 1;
+        }
+
+        .movie-rating {
+            color: #E50914;
+            font-weight: bold;
+            margin: 0.5rem 0;
+        }
+
+        .movie-genres {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin: 0.5rem 0;
+        }
+
+        .movie-genre {
+            background-color: #E50914;
+            color: white;
+            padding: 0.2rem 0.5rem;
+            border-radius: 3px;
+            font-size: 0.8rem;
+        }
+
+        .movie-cast {
+            font-size: 0.9rem;
+            color: #999;
+            margin: 0.5rem 0;
+        }
+
+        .movie-director {
+            font-size: 0.9rem;
+            color: #E50914;
+            margin-bottom: 0.5rem;
+        }
+
+        .trending-section {
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .trending-title {
+            color: #ffffff;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .trending-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+        .trending-card {
+            position: relative;
+            border-radius: 4px;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .trending-card:hover {
+            transform: scale(1.05);
+        }
+
+        .trending-card img {
+            width: 100%;
+            height: 225px;
+            object-fit: cover;
+        }
+
+        .trending-info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 0.5rem;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.9));
+            color: white;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            font-size: 1.2rem;
+            color: #E50914;
+        }
+
+        .error {
+            text-align: center;
+            padding: 2rem;
+            font-size: 1.2rem;
+            color: #E50914;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="#" class="logo">FlickFrenzy</a>
+        <div class="nav-links">
+            <a href="#">Home</a>
+            <a href="#">Movies</a>
+            <a href="#">My List</a>
+            <a href="#">Profile</a>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <h1>Welcome to FlickFrenzy</h1>
+        <p>Discover your next favorite movie</p>
+        <div class="filters">
+            <select id="genreSelect" class="filter-select">
+                <option value="">Select Genre</option>
+            </select>
+            <select id="languageSelect" class="filter-select">
+                <option value="">Select Language</option>
+            </select>
+            <select id="ratingSelect" class="filter-select">
+                <option value="">Minimum Rating</option>
+                <option value="1">1+ Stars</option>
+                <option value="2">2+ Stars</option>
+                <option value="3">3+ Stars</option>
+                <option value="4">4+ Stars</option>
+                <option value="5">5+ Stars</option>
+                <option value="6">6+ Stars</option>
+                <option value="7">7+ Stars</option>
+                <option value="8">8+ Stars</option>
+                <option value="9">9+ Stars</option>
+                <option value="10">10 Stars</option>
+            </select>
+        </div>
+        <div class="search-container">
+            <input type="text" class="search-box" placeholder="Search for movies...">
+        </div>
+        <button class="cta-button" onclick="fetchMovies()">Get Movie Suggestion</button>
+    </section>
+
+    <section class="movie-grid">
+        <!-- Movie card will be dynamically added here -->
+    </section>
+
+    <section class="trending-section">
+        <h2 class="trending-title">Trending This Week</h2>
+        <div class="trending-grid">
+            <!-- Trending movies will be added here -->
+        </div>
+    </section>
+
+    <script>
+        // Fetch available genres and languages
+        async function fetchFilters() {
+            try {
+                console.log('Fetching filters...');
+                const [genresResponse, languagesResponse] = await Promise.all([
+                    fetch('http://localhost:3000/api/genres'),
+                    fetch('http://localhost:3000/api/languages')
+                ]);
+
+                if (!genresResponse.ok || !languagesResponse.ok) {
+                    throw new Error('Failed to fetch filters');
+                }
+
+                const genres = await genresResponse.json();
+                const languages = await languagesResponse.json();
+
+                console.log('Received genres:', genres);
+                console.log('Received languages:', languages);
+
+                const genreSelect = document.getElementById('genreSelect');
+                const languageSelect = document.getElementById('languageSelect');
+
+                // Clear existing options except the first one
+                genreSelect.innerHTML = '<option value="">Select Genre</option>';
+                languageSelect.innerHTML = '<option value="">Select Language</option>';
+
+                genres.forEach(genre => {
+                    const option = document.createElement('option');
+                    option.value = genre;
+                    option.textContent = genre.charAt(0).toUpperCase() + genre.slice(1);
+                    genreSelect.appendChild(option);
+                });
+
+                languages.forEach(language => {
+                    const option = document.createElement('option');
+                    option.value = language;
+                    option.textContent = language.charAt(0).toUpperCase() + language.slice(1);
+                    languageSelect.appendChild(option);
+                });
+
+                console.log('Filters initialized successfully');
+            } catch (error) {
+                console.error('Error fetching filters:', error);
+                alert('Failed to load genres and languages. Please refresh the page.');
+            }
+        }
+
+        // Fetch trending movies
+        async function fetchTrending() {
+            try {
+                const response = await fetch('http://localhost:3000/api/trending');
+                const movies = await response.json();
+
+                const trendingGrid = document.querySelector('.trending-grid');
+                trendingGrid.innerHTML = '';
+
+                movies.forEach(movie => {
+                    const movieCard = document.createElement('div');
+                    movieCard.className = 'trending-card';
+                    movieCard.innerHTML = `
+                        <img src="${movie.image}" alt="${movie.title}">
+                        <div class="trending-info">
+                            <h3>${movie.title}</h3>
+                            <p class="movie-rating">⭐ ${movie.rating.toFixed(1)}</p>
+                        </div>
+                    `;
+                    trendingGrid.appendChild(movieCard);
+                });
+            } catch (error) {
+                console.error('Error fetching trending movies:', error);
+            }
+        }
+
+        // Fetch movies based on selected filters
+        async function fetchMovies() {
+            const genre = document.getElementById('genreSelect').value;
+            const language = document.getElementById('languageSelect').value;
+            const rating = document.getElementById('ratingSelect').value;
+
+            if (!genre || !language) {
+                alert('Please select both genre and language');
+                return;
+            }
+
+            const movieGrid = document.querySelector('.movie-grid');
+            movieGrid.innerHTML = '<div class="loading">Finding your perfect movie...</div>';
+
+            try {
+                const queryParams = new URLSearchParams({
+                    genre,
+                    language,
+                    ...(rating && { rating })
+                });
+
+                console.log('Fetching movie with params:', queryParams.toString());
+                const response = await fetch(`http://localhost:3000/api/movies?${queryParams}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const movie = await response.json();
+                console.log('Received movie:', movie);
+
+                movieGrid.innerHTML = '';
+                const movieCard = document.createElement('div');
+                movieCard.className = 'movie-card';
+                movieCard.innerHTML = `
+                    <img src="${movie.image}" alt="${movie.title}" onerror="this.src='https://via.placeholder.com/500x750?text=No+Image+Available'">
+                    <div class="movie-overlay">
+                        <h3>${movie.title}</h3>
+                        <p class="movie-director">Director: ${movie.director || 'Unknown'}</p>
+                        <p class="movie-rating">⭐ ${movie.rating.toFixed(1)}</p>
+                        <div class="movie-genres">
+                            ${movie.genres.map(genre => `<span class="movie-genre">${genre}</span>`).join('')}
+                        </div>
+                        <p class="movie-cast">Cast: ${movie.cast.join(', ')}</p>
+                        <p>${movie.overview}</p>
+                        ${movie.trailer ? `
+                            <a href="https://www.youtube.com/watch?v=${movie.trailer}" 
+                               target="_blank" 
+                               class="cta-button" 
+                               style="margin-top: 1rem; text-align: center;">
+                                Watch Trailer
+                            </a>
+                        ` : ''}
+                    </div>
+                `;
+                movieGrid.appendChild(movieCard);
+            } catch (error) {
+                console.error('Error fetching movie:', error);
+                movieGrid.innerHTML = `<div class="error">Error finding movie: ${error.message}</div>`;
+            }
+        }
+
+        // Initialize filters and trending movies when the page loads
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                console.log('Page loaded, initializing...');
+                await fetchFilters();
+                console.log('Fetching trending movies...');
+                await fetchTrending();
+                console.log('Initialization complete');
+            } catch (error) {
+                console.error('Error during initialization:', error);
+            }
+        });
+
+        // Search functionality
+        const searchBox = document.querySelector('.search-box');
+        searchBox.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const movieCards = document.querySelectorAll('.movie-card');
+            
+            movieCards.forEach(card => {
+                const title = card.querySelector('h3').textContent.toLowerCase();
+                if (title.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
