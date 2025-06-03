@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: flickfrenzy
+    env: node
+    buildCommand: npm install && cd src && npm install
+    startCommand: cd src && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: TMDB_API_KEY
+        sync: false
