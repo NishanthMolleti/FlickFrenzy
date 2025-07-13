@@ -9,3 +9,4 @@ services:
         value: production
       - key: TMDB_API_KEY
         sync: false
+    staticPublishPath: ./src/public
