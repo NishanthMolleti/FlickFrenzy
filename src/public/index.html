@@ -314,7 +314,7 @@
         <div class="search-container">
             <input type="text" class="search-box" placeholder="Search for movies...">
         </div>
-        <button class="cta-button" onclick="fetchMovies()">Get Movie Suggestion</button>
+        <button class="cta-button" onclick="fetchMovies()">Get Movie Suggestions</button>
     </section>
 
     <section class="movie-grid">
@@ -329,10 +329,10 @@
     </section>
 
     <script>
-        // API base URL
+        // API base URL - automatically detects production vs development
         const API_BASE_URL = window.location.hostname === 'localhost' 
-            ? 'http://localhost:3000' 
-            : window.location.origin;
+            ? 'http://localhost:3001' 
+            : `https://flickfrenzy-backend.onrender.com`;
 
         // Fetch available genres and languages
         async function fetchFilters() {
@@ -419,7 +419,7 @@
             }
 
             const movieGrid = document.querySelector('.movie-grid');
-            movieGrid.innerHTML = '<div class="loading">Finding your perfect movie...</div>';
+            movieGrid.innerHTML = '<div class="loading">Finding your perfect movies...</div>';
 
             try {
                 const queryParams = new URLSearchParams({
@@ -428,44 +428,51 @@
                     ...(rating && { rating })
                 });
 
-                console.log('Fetching movie with params:', queryParams.toString());
+                console.log('Fetching movies with params:', queryParams.toString());
                 const response = await fetch(`${API_BASE_URL}/api/movies?${queryParams}`);
                 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 
-                const movie = await response.json();
-                console.log('Received movie:', movie);
+                const movies = await response.json();
+                console.log('Received movies:', movies);
+
+                if (!movies || movies.length === 0) {
+                    movieGrid.innerHTML = '<div class="error">No movies found. Try different filters.</div>';
+                    return;
+                }
 
                 movieGrid.innerHTML = '';
-                const movieCard = document.createElement('div');
-                movieCard.className = 'movie-card';
-                movieCard.innerHTML = `
-                    <img src="${movie.image}" alt="${movie.title}" onerror="this.src='https://via.placeholder.com/500x750?text=No+Image+Available'">
-                    <div class="movie-overlay">
-                        <h3>${movie.title}</h3>
-                        <p class="movie-director">Director: ${movie.director || 'Unknown'}</p>
-                        <p class="movie-rating">⭐ ${movie.rating.toFixed(1)}</p>
-                        <div class="movie-genres">
-                            ${movie.genres.map(genre => `<span class="movie-genre">${genre}</span>`).join('')}
+                movies.forEach(movie => {
+                    const movieCard = document.createElement('div');
+                    movieCard.className = 'movie-card';
+                    movieCard.innerHTML = `
+                        <img src="${movie.image}" alt="${movie.title}" onerror="this.src='https://via.placeholder.com/500x750?text=No+Image+Available'">
+                        <div class="movie-overlay">
+                            <h3>${movie.title}</h3>
+                            <p class="movie-director">Director: ${movie.director || 'Unknown'}</p>
+                            <p class="movie-rating">⭐ ${movie.rating.toFixed(1)}</p>
+                            <div class="movie-genres">
+                                ${movie.genres.map(genre => `<span class="movie-genre">${genre}</span>`).join('')}
+                            </div>
+                            <p class="movie-cast">Cast: ${movie.cast.join(', ')}</p>
+                            <p>${movie.overview}</p>
+                            ${movie.trailer ? `
+                                <a href="https://www.youtube.com/watch?v=${movie.trailer}" 
+                                   target="_blank" 
+                                   class="cta-button" 
+                                   style="margin-top: 1rem; text-align: center;">
+                                    Watch Trailer
+                                </a>
+                            ` : ''}
                         </div>
-                        <p class="movie-cast">Cast: ${movie.cast.join(', ')}</p>
-                        <p>${movie.overview}</p>
-                        ${movie.trailer ? `
-                            <a href="https://www.youtube.com/watch?v=${movie.trailer}" 
-                               target="_blank" 
-                               class="cta-button" 
-                               style="margin-top: 1rem; text-align: center;">
-                                Watch Trailer
-                            </a>
-                        ` : ''}
-                    </div>
-                `;
-                movieGrid.appendChild(movieCard);
+                    `;
+                    movieGrid.appendChild(movieCard);
+                });
             } catch (error) {
-                console.error('Error fetching movie:', error);
-                movieGrid.innerHTML = `<div class="error">Error finding movie: ${error.message}</div>`;
+                console.error('Error fetching movies:', error);
+                movieGrid.innerHTML = `<div class="error">Error finding movies: ${error.message}</div>`;
             }
         }
 

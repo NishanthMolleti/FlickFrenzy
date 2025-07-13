@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: flickfrenzy
+    name: flickfrenzy-backend
     env: node
     buildCommand: npm install && cd src && npm install
     startCommand: cd src && npm start
@@ -8,5 +8,4 @@ services:
       - key: NODE_ENV
         value: production
       - key: TMDB_API_KEY
-        sync: false
-    staticPublishPath: ./src/public
+        value: 20f841dd13926b7983444db8aa12c380

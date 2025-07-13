@@ -1,12 +1,10 @@
 {
-  "name": "flickfrenzy-root",
+  "name": "flickfrenzy",
   "version": "1.0.0",
-  "private": true,
-  "workspaces": [
-    "src"
-  ],
+  "description": "A movie recommendation website",
   "scripts": {
     "start": "cd src && npm start",
-    "build": "cd src && npm install"
+    "dev": "cd src && npm run dev",
+    "install-deps": "cd src && npm install"
   }
 } 
