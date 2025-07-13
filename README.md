@@ -4,7 +4,11 @@ FlickFrenzy is your ultimate movie companion that helps you discover your next f
 
 ## About
 
-FlickFrenzy is a modern web application that provides personalized movie recommendations based on your preferences. Whether you're looking for the latest blockbusters, hidden gems, or classic masterpieces, FlickFrenzy has got you covered.
+FlickFrenzy is a modern web application that provides personalized movie recommendations based on your preferences which can be watched on Netflix. Whether you're looking for the latest blockbusters, hidden gems, or classic masterpieces, FlickFrenzy has got you covered.
+
+## Website Link
+https://flickfrenzy-backend.onrender.com/
+
 
 ## Features
 
